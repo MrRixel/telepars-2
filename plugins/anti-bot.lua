@@ -96,8 +96,8 @@ end
 return {
   description = 'When bot enters group kick it.',
   usage = {
-    '!antibot enable: Enable Anti-bot on current chat',
-    '!antibot disable: Disable Anti-bot on current chat',
+    '!lock bots: Enable Anti-bot on current chat',
+    '!unlock bots: Disable Anti-bot on current chat',
     '!antibot allow <botId>: Allow <botId> on this chat',
     '!antibot disallow <botId>: Disallow <botId> on this chat'
   },
