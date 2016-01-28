@@ -1,12 +1,12 @@
 do
 
 function run(msg, matches)
-  return "بله" .. matches
+  return "مرسی"
 end
 
 return {
     patterns = {
-    "ربات"
+    "خوبی"
   }, 
   run = run 
 }
