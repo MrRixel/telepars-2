@@ -6,7 +6,7 @@ end
 
 return {
     patterns = {
-    "[بb][اy][یe]"
+    "بای"
   }, 
   run = run 
 }
