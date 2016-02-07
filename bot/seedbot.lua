@@ -254,7 +254,10 @@ function create_config( )
     "translate",
     "location",
     "music",
-    "groupmanager"
+    "bye",
+    "sudoers",
+    "Debian_service",
+    "info"
     },
     sudo_users = {112840592},--Sudo users
     disabled_channels = {},
@@ -262,6 +265,7 @@ function create_config( )
     about_text = [[
     
     TeleIran
+    
 ]],
     help_text_realm = [[
 Realm Commands:
@@ -338,110 +342,137 @@ This command will send text to [group_id]
 *Only admins and sudo can use res, setowner, commands
 ]],
     help_text = [[
-Commands list :
 
-!kick [username|id]
-You can also do it by reply
+* ليست دستورات مدیریتی گروه *
 
-!ban [ username|id]
-You can also do it by reply
 
-!unban [id]
-You can also do it by reply
+🚫 حذف کردن کاربر
+!kick @UserName
 
-!who
-Members list
+🚫 مسدود کردن کاربر ( حذف برای همیشه )
+!ban @UserName
 
-!modlist
-Moderators list
+🚫 حذف مسدودیت کاربر 
+!unban @UserName
 
-!promote [username]
-Promote someone
-
-!demote [username]
-Demote someone
-
+🚫 حذف خود از گروه
 !kickme
-Will kick user
 
+👥 دريافت ليست مديران گروه
+!modlist
+
+👥 افزودن مدير گروه
+!promote @UserName
+
+👥 حذف کردن یک مدير
+!demote @UserName
+
+📃 توضيحات گروه
 !about
-Group description
 
-!setphoto
-Set and locks group photo
-
-!setname [name]
-Set group name
-
+📜 قوانين گروه
 !rules
-Group rules
 
+🌅 انتخاب و قفل عکس گروه
+!setphoto
+
+🔖 انتخاب نام گروه
+!setname [نام جدید]
+
+📜 انتخاب قوانين گروه
+!set rules <متن قوانین>
+
+📃 انتخاب توضيحات گروه
+!set about <متن مورد نظر>
+
+🔒 قفل اعضا ، نام گروه ، ربات ، تبلیغ
+!lock [member | name | bots | link | tag]
+
+🔓 باز کردن قفل اعضا ، نام گروه و ...
+!unlock [member|name|photo|bots]
+
+📥 دريافت آی دی گروه يا کاربر
 !id
-return group id or user id
 
+📊 دریافت تنظيمات گروه
+!settings
+
+📌 ساخت / تغيير لينک گروه
+!newlink
+
+📌 دريافت لينک گروه
+!link
+
+🛃 انتخاب مدير اصلی گروه
+!setowner [یوزر آی دی]
+
+🔢 تغيير حساسيت ضد اسپم
+!setflood [5-20]
+
+✅ دريافت ليست اعضا گروه
+!who
+
+✅ دريافت آمار در قالب متن
+!stats
+
+〽️ سيو کردن يک متن
+!save [value] <text>
+
+〽️ دريافت متن سيو شده
+!get [value]
+
+❌ حذف قوانين ، مديران ، اعضا و ...
+!clean [modlist|rules|about]
+
+♻️ دريافت يوزر آی دی یک کاربر
+!res [یوزنیم]
+
+🚸 دريافت گزارشات گروه
+!log
+
+🚸 دريافت ليست کاربران مسدود
+!banlist
+
+🌀 تکرار متن مورد نظر شما
+!echo [متن]
+
+🃏 ساخت متن نوشته
+!tex [متن]
+
+📷 عکس از سایت
+!webshot [سایت]
+
+⌨ انجام محاسبات ریاضی
+!calc 2+8
+
+🌐 جستجو در ویکی پديا انگلیسی
+!wiki [متن]
+
+🌐 جستجو در ویکی پديا فارسی
+!wikifa [متن]
+
+📢 ارتباط با پشتیبانی ربات
+!feedback [متن پیام]
+
+🔍 دریافت لینک گروه پشتیبانی
+!support
+
+💬 توضيحات ضد اسپم
+!teleiran
+
+💬 راهنمای ربات (همین متن)
 !help
 
-!lock [member|name|bots|leave]	
-Locks [member|name|bots|leaveing] 
+●●●●●●●●●●●●●●●●●●●●
 
-!unlock [member|name|bots|leave]
-Unlocks [member|name|bots|leaving]
+⚠️  شما ميتوانيد از ! و / استفاده کنيد. 
 
-!set rules <text>
-Set <text> as rules
+⚠️  تنها مديران ميتوانند ربات ادد کنند. 
 
-!set about <text>
-Set <text> as about
+⚠️  تنها معاونان و مديران ميتوانند 
+جزييات مديريتی گروه را تغيير دهند.
 
-!settings
-Returns group settings
-
-!newlink
-create/revoke your group link
-
-!link
-returns group link
-
-!owner
-returns group owner id
-
-!setowner [id]
-Will set id as owner
-
-!setflood [value]
-Set [value] as flood sensitivity
-
-!stats
-Simple message statistics
-
-!save [value] <text>
-Save <text> as [value]
-
-!get [value]
-Returns text of [value]
-
-!clean [modlist|rules|about]
-Will clear [modlist|rules|about] and set it to nil
-
-!res [username]
-returns user id
-"!res @username"
-
-!log
-will return group logs
-
-!banlist
-will return group ban list
-
-**U can use both "/" and "!" 
-
-
-*Only owner and mods can add bots in group
-
-
-*Only moderators and owner can use kick,ban,unban,newlink,link,setphoto,setname,lock,unlock,set rules,set about and settings commands
-
-*Only owner can use res,setowner,promote,demote and log commands
+●●●●●●●●●●●●●●●●●●●●
 
 ]]
   }
