@@ -205,7 +205,7 @@ function create_config( )
   config = {
     enabled_plugins = {
     "onservice",
-    "inrealm",
+"inrealm",
     "ingroup",
     "inpm",
     "banhammer",
@@ -246,18 +246,25 @@ function create_config( )
     "teleiran",
     "support",
     "wiki",
-    "slm",
-    "per1",
-    "per2",
     "inviteme",
     "media",
     "translate",
     "location",
     "music",
-    "bye",
     "sudoers",
     "Debian_service",
-    "info"
+    "info",
+    "slm",
+    "fuck",
+    "spam",
+    "dic",
+    "server",
+    "filter",
+    "txt",
+    "getplugin",
+    "addplug",
+    "mark",
+    "spam",
     },
     sudo_users = {112840592},--Sudo users
     disabled_channels = {},
@@ -458,7 +465,7 @@ This command will send text to [group_id]
 !support
 
 💬 توضيحات ضد اسپم
-!teleiran
+!TeleIran
 
 💬 راهنمای ربات (همین متن)
 !help
