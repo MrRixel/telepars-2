@@ -1,4 +1,6 @@
 do
+
+
 data = load_data(_config.moderation.data)
 local function get_msgs_user_chat(user_id, chat_id)
   local user_info = {}
@@ -9,6 +11,7 @@ local function get_msgs_user_chat(user_id, chat_id)
   user_info.name = user_print_name(user)..' ['..user_id..']'
   return user_info
 end
+
 local function chat_stats(chat_id)
   local hash = 'chat:'..chat_id..':users'
   local users = redis:smembers(hash)
@@ -23,21 +26,13 @@ local function chat_stats(chat_id)
         return a.msgs > b.msgs
       end
     end)
-  local text = 'Chat stats:\n'
+  local text = 'آمار گروه! \n'
   for k,user in pairs(users_info) do
     text = text..user.name..' = '..user.msgs..'\n'
   end
   return text
 end
 
-local function get_group_type(target)
-  local data = load_data(_config.moderation.data)
-  local group_type = data[tostring(target)]['group_type']
-    if not group_type or group_type == nil then
-       return 'No group type available.'
-    end
-      return group_type
-end
 local function show_group_settings(target)
   local data = load_data(_config.moderation.data)
   if data[tostring(target)] then
@@ -49,7 +44,7 @@ local function show_group_settings(target)
     end
   end
   local settings = data[tostring(target)]['settings']
-  local text = "Lock group name : "..settings.lock_name.."\nLock group photo : "..settings.lock_photo.."\nLock group member : "..settings.lock_member.."\nflood sensitivity : "..NUM_MSG_MAX
+  local text = "قفل نام گروه : "..settings.lock_name.."\nقفل عکس گروه : "..settings.lock_photo.."\nقفل اعضای گروه : "..settings.lock_member.."\nحساسیت اسپم : "..NUM_MSG_MAX
   return text
 end
 
@@ -57,7 +52,7 @@ local function get_description(target)
   local data = load_data(_config.moderation.data)
   local data_cat = 'description'
   if not data[tostring(target)][data_cat] then
-    return 'No description available.'
+    return 'توضیحی موجود نیست Zzzz.'
   end
   local about = data[tostring(target)][data_cat]
   return about
@@ -67,24 +62,22 @@ local function get_rules(target)
   local data = load_data(_config.moderation.data)
   local data_cat = 'rules'
   if not data[tostring(target)][data_cat] then
-    return 'No rules available.'
+    return 'قوانین موجود نیست Zzzz.'
   end
   local rules = data[tostring(target)][data_cat]
   return rules
 end
-
-
+-- Group information in TXT v1.1 By  @PokerFace_Dev
 local function modlist(target)
   local data = load_data(_config.moderation.data)
-  local groups = 'groups'
-  if not data[tostring(groups)] or not data[tostring(groups)][tostring(target)] then
-    return 'Group is not added or is Realm.'
+  if not data[tostring(target)] then
+    return 'گروه ثبت نشده است.'
   end
   if next(data[tostring(target)]['moderators']) == nil then
     return 'No moderator in this group.'
   end
   local i = 1
-  local message = '\nList of moderators :\n'
+  local message = '\nلیست مدیران :\n'
   for k,v in pairs(data[tostring(target)]['moderators']) do
     message = message ..i..' - @'..v..' [' ..k.. '] \n'
     i = i + 1
@@ -95,39 +88,38 @@ end
 local function get_link(target)
   local data = load_data(_config.moderation.data)
   local group_link = data[tostring(target)]['settings']['set_link']
-  if not group_link or group_link == nil then 
-    return "No link"
+  if not group_link then 
+    return "لینک موجود نیست"
   end
-  return "Group link:\n"..group_link
+  return "لینک گروه:\n"..group_link
 end
 
 local function all(target, receiver)
-  local text = "All the things I know about this group\n\n"
-  local group_type = get_group_type(target)
-  text = text.."Group Type: \n"..group_type
+  local text = "همه پیز درباره این گروه \n \n"
   local settings = show_group_settings(target)
-  text = text.."\n\nGroup settings: \n"..settings
+  text = text.."تنظیمات گروه  \n"..settings
   local rules = get_rules(target)
-  text = text.."\n\nRules: \n"..rules
+  text = text.."\n\nقوانین: \n"..rules
   local description = get_description(target)
-  text = text.."\n\nAbout: \n"..description
+  text = text.."\n\nدرباره: \n"..description
   local modlist = modlist(target)
-  text = text.."\n\nMods: \n"..modlist
+  text = text.."\n\n"..modlist
   local link = get_link(target)
-  text = text.."\n\nLink: \n"..link
+  text = text.."\n\n"..link
   local stats = chat_stats(target)
   text = text.."\n\n"..stats
   local ban_list = ban_list(target)
   text = text.."\n\n"..ban_list
-  local file = io.open("./groups/all/"..target.."all.txt", "w")
+  local file = io.open("./groups/"..target.."all.txt", "w")
   file:write(text)
   file:flush()
   file:close()
-  send_document(receiver,"./groups/all/"..target.."all.txt", ok_cb, false)
+  send_document(receiver,"./groups/"..target.."all.txt", ok_cb, false)
   return
 end
-
+-- Group information in TXT v1.1 By  @PokerFace_Dev
 function run(msg, matches)
+
   if matches[1] == "all" and matches[2] and is_owner2(msg.from.id, matches[2]) then
     local receiver = get_receiver(msg)
     local target = matches[2]
@@ -136,20 +128,21 @@ function run(msg, matches)
   if not is_owner(msg) then
     return
   end
-  if matches[1] == "all" and not matches[2] then
+  if matches[1] == "all" and not matches[2] and msg.to.id ~= our_id then
     local receiver = get_receiver(msg)
     if not is_owner(msg) then
       return
     end
     return all(msg.to.id, receiver)
   end
-end
 
+  return
+end
 
 return {
   patterns = {
-  "^[!/](all)$",
-  "^[!/](all) (%d+)$"
+    "^[!~/]([Aa]ll)$",
+    "^[!~/]([Aa]ll) (%d+)$"
   },
   run = run
 }
