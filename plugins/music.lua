@@ -1,97 +1,89 @@
 do
 
-local BASE_LNM_URL = 'http://api.lyricsnmusic.com/songs'
-local LNM_APIKEY = '1f5ea5cf652d9b2ba5a5118a11dba5'
+  -- Base search URL
+  local BASE_URL = 'http://pleer.com/mobile/search?q='
 
-local BASE_LYRICS_URL = 'http://api.chartlyrics.com/apiv1.asmx/SearchLyricDirect'
+  -- Base download URL
+  local BASE_DL_URL = 'http://pleer.com/mobile/files_mobile/'
 
-local function getInfo(query)
-  print('Getting info of ' .. query)
+  local htmlparser = require 'htmlparser'
 
-  local url = BASE_LNM_URL..'?api_key='..LNM_APIKEY
-    ..'&q='..URL.escape(query)
-
-  local b, c = http.request(url)
-  if c ~= 200 then
-    return nil
+  -- Provide download link
+  local function getDownloadLink(id)
+    return BASE_DL_URL .. id .. '.mp3'
   end
 
-  local result = json:decode(b)
-  local artist = result[1].artist.name
-  local track = result[1].title
-  return artist, track
-end
-
-local function getLyrics(query)
-
-  local artist, track = getInfo(query)
-  if artist and track then
-    local url = BASE_LYRICS_URL..'?artist='..URL.escape(artist)
-      ..'&song='..URL.escape(track)
-
-    local b, c = http.request(url)
+  local function getLyrics(q)
+    local b, c = http.request(BASE_URL .. URL.escape(q))
     if c ~= 200 then
-      return nil
+     return "Oops! Network errors! Try again later."
     end
 
-    local xml = require("xml")
-    local result = xml.load(b)
+    local root = htmlparser.parse(b)
+    local tracks = root('.track')
+    local output = 'برای دانلود لینک دانلود رو به صورت \n/getmusic [URL]\n نویسید.\n'
 
-    if not result then
-      return nil
+    -- If no tracks found
+    if #tracks < 1 then
+        return 'اهنگ مورد نظر پیدا نشد :( به زودی API تغییر میکند.'
     end
 
-    if xml.find(result, 'LyricSong') then
-      track = xml.find(result, 'LyricSong')[1]
+    for i, track in pairs(tracks) do
+
+        -- Track id
+        local trackId = track.id
+
+	-- Remove that starting 't' in the id of element
+        trackId = trackId:sub(2)
+
+        -- Parse track
+        track = track:getcontent()
+        track = htmlparser.parse(track)
+
+        -- Track artist
+        local artist = track:select('.artist')[1]
+        artist = unescape_html(artist:getcontent())
+
+        -- Track title 
+        local title = track:select('.title')[1]
+        title = unescape_html(title:getcontent())
+
+        -- Track time
+        local time = track:select('.time')[1]
+        time = time:getcontent()
+        time = time:sub(-5)
+
+        -- Track specs
+        local specs = track:select('.specs')[1]
+        specs = specs:getcontent()
+        specs = specs:split(',')
+	-- Size
+        local size = specs[1]:trim()
+	-- Bitrate
+        local bitrate = specs[2]:trim()
+
+
+	-- Generate an awesome, well formated output
+        output = output .. i .. '. ' .. artist ..'\n'
+        .. '🕚 ' .. time .. ' | ' .. ' 🎧 ' .. bitrate .. ' | ' .. ' 📎  ' .. size .. '\n'
+        .. '💾 : ' .. getDownloadLink(trackId) .. '\n\n '
+		
     end
-
-    if xml.find(result, 'LyricArtist') then
-      artist = xml.find(result, 'LyricArtist')[1]
-    end
-
-    local lyric
-    if xml.find(result, 'Lyric') then
-      lyric = xml.find(result, 'Lyric')[1]
-    else
-      lyric = nil
-    end
-
-    local cover
-    if xml.find(result, 'LyricCovertArtUrl') then
-      cover = xml.find(result, 'LyricCovertArtUrl')[1]
-    else
-      cover = nil
-    end
-
-    return artist, track, lyric, cover
-
-  else
-    return nil
+    
+    return output
   end
 
-end
-
-
-local function run(msg, matches)
-  local artist, track, lyric, cover = getLyrics(matches[1])
-  if track and artist and lyric then
-    if cover then
-      local receiver = get_receiver(msg)
-      send_photo_from_url(receiver, cover)
-    end
-    return '🎵 ' .. artist .. ' - ' .. track .. ' 🎵\n----------\n' .. lyric
-  else
-    return 'Oops! Lyrics not found or something like that! :/'
+  local function run(msg, matches)
+    return getLyrics(matches[1])
   end
-end
 
-return {
-  description = 'Getting lyrics of a song',
-  usage = '!lyrics [track or artist - track]: Search and get lyrics of the song',
-  patterns = {
-     '^!music (.*)$'
-  },
-  run = run
+  return {
+    description = 'Search and get music from pleer',
+    usage = '!music [track name or artist and track name]: Search and get the music',
+    patterns = {
+    '^!music (.*)$'
+    },
+    run = run
 }
 
 end
